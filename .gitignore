@@ -136,7 +136,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
-.rav.yaml/
+rav.yaml/
 # Spyder project settings
 .spyderproject
 .spyproject
