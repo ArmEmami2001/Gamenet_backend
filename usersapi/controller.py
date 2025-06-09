@@ -13,7 +13,11 @@ class customercontrol:
     
 @api_controller("/worker")
 class Workercontrol:
-
+    @route.post("/create-customer", response=schema.customerschema)
+    def create_customer(self, payload: schema.CustomerInSchema):
+        new_customer = models.Customer.objects.create(**payload.dict())
+        return new_customer
+    
     @route.get("",response=schema.workerschema)
     def workerstat(self):
         return models.Worker.objects.all()

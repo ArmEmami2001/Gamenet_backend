@@ -6,6 +6,9 @@ class subsschema(ModelSchema):
         model = models.Subs
         fields = ['id', 'subtime']
 
+class CustomerInSchema(Schema):
+    name: str
+    password: str
 
 class customerschema(ModelSchema):
     days_remaining: int 

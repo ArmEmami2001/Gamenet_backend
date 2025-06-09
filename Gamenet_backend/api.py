@@ -7,7 +7,5 @@ api = NinjaExtraAPI(
     urls_namespace="gamenet_api"
 )
 
-api.register_controllers(controller.customercontrol,
-                         controller.Workercontrol
-                         )
-# api.register_controllers(controller.Workercontrol)
+api.register_controllers(controller.customercontrol)
+api.register_controllers(controller.Workercontrol)
