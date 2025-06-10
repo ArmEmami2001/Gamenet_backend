@@ -5,9 +5,3 @@ scripts:
     - python manage.py makemigrations
   migrate:
     - python manage.py migrate
-  shell:
-<<<<<<< HEAD
-    - python manage.py shell
-=======
-    - python manage.py shell
->>>>>>> 1c506c8c2dc46c7e7514f8e26537fd29021010bb
