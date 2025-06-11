@@ -65,9 +65,15 @@ class customerschema(ModelSchema):
 #             return object.subs
         
 class workerschema(ModelSchema):
+    username: str
+    @staticmethod
+    def resolve_username(obj):
+        if obj.user:
+            return obj.user.username
+        return "N/A"
     class Meta:
         model = models.Worker
-        fields = ['id', 'name','worktime']
+        fields = ['id','worktime']
 
 
 class Errorresponseschema(Schema):

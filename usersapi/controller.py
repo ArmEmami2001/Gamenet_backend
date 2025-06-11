@@ -13,7 +13,8 @@ from ninja.responses import Response
 from django.contrib.auth.models import User
 import logging
 from . import router
-auth = router.JWTAuth
+auth = router.JWTAuth()
+auth_Employee=router.EmployeeAuth()
 logger = logging.getLogger(__name__)
 
 @api_controller("/auth")
@@ -73,9 +74,37 @@ class customercontrol:
         
         return customer
     
-@api_controller("/worker")
-class Workercontrol:
-    
+@api_controller("/employee")
+class Employeecontrol:
+    @route.post("add_employee",auth=None, response=schema.workerschema)
+    def addemployee (self,request,payload:schema.LoginSchema):
+        
+        logger.info(f"User creation attempt for '{payload.username}'")
+
+        try:
+            
+            new_user = User.objects.create_user(
+                username=payload.username,
+                password=payload.password
+
+            )
+        except IntegrityError:
+            
+            return 409, {"message": f"Username '{payload.username}' already exists."}
+        except Exception as e:
+
+            logger.error(f"Failed to create user '{payload.username}'. Error: {e}")
+            return 400, {"message": "Failed to create user."}
+        
+        new_empolyee = models.Worker.objects.create(user=new_user)
+
+        
+        
+        
+        login(request, new_user)
+        logger.info(f"User '{new_user.username}' created and logged in successfully.")
+
+        return 201, new_empolyee
     
     # def create_customer(self, payload: schema.LoginSchema):
     #     try:
@@ -105,15 +134,15 @@ class Workercontrol:
     #     # )
     #     # return new_customer
     
-    @route.get("",response=List[schema.workerschema])
-    def workerstat(self):
+    @route.get("",auth=None ,response=List[schema.workerschema])
+    def employeerstat(self):
         return models.Worker.objects.all()
     
-    @route.get("/addsub",response=List[schema.customerschema]) 
+    @route.get("/addsub",auth=auth_Employee,response=List[schema.customerschema]) 
     def addsub(self):
         return models.Customer.objects.all()
     
-    @route.post("/addsub/{pk}",response=schema.customerschema)
+    @route.post("/addsub/{pk}",auth=auth_Employee,response=schema.customerschema)
     def addsubs(self,pk,time:date):
         customer = get_object_or_404(models.Customer, id=pk)
         sub=customer.subs

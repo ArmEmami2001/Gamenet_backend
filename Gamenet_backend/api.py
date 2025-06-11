@@ -10,5 +10,5 @@ api = NinjaExtraAPI(
 )
 
 api.register_controllers(controller.customercontrol)
-api.register_controllers(controller.Workercontrol)
+api.register_controllers(controller.Employeecontrol)
 api.register_controllers(controller.AuthController)
