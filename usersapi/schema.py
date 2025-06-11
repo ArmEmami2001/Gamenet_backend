@@ -18,7 +18,7 @@ class TokenResponseSchema(Schema):
     refresh: str
 
 class customerschema(ModelSchema):
-    # Resolver for username
+    
     username: str
     @staticmethod
     def resolve_username(obj):
@@ -26,14 +26,13 @@ class customerschema(ModelSchema):
             return obj.user.username
         return "N/A"
 
-    # Resolver for days_remaining
+    
     days_remaining: int
-    # Ensure this resolver is a @staticmethod
+    
     @staticmethod
     def resolve_days_remaining(obj):
-        if obj.subs and obj.subs.subtime:
-            remaining = (obj.subs.subtime - date.today()).days
-            # Return 0 or a negative number, but ensure it's an int
+        if obj.subs: 
+            remaining = (obj.subs - date.today()).days 
             return remaining if remaining > 0 else 0
         return 0
 

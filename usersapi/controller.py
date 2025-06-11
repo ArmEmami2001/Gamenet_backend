@@ -35,7 +35,7 @@ class AuthController:
 @api_controller("/customer", auth=None)
 class customercontrol:
 
-    @route.post("/create-customer", response={201:schema.customerschema,200:schema.customerschema, 422:schema.Errorresponseschema, 500:schema.Errorresponseschema})
+    @route.post("/create-customer", response={201:schema.customerschema,200:schema.customerschema, 409:schema.Errorresponseschema, 500:schema.Errorresponseschema})
     def create_customer(self, request, payload: schema.LoginSchema):
         
         # ip_address = request.META.get("REMOTE_ADDR")
@@ -56,10 +56,9 @@ class customercontrol:
             return 400, {"message": "Failed to create user."}
 
         
-        new_subscription = models.Subs.objects.create(subtime=timezone.now().date())
         new_customer = models.Customer.objects.create(
             user=new_user, 
-            subs=new_subscription
+            subs=timezone.now().date()
         )
 
         
@@ -150,11 +149,10 @@ class Employeecontrol:
     def addsub(self):
         return models.Customer.objects.all()
     
-    @route.post("/addsub/{pk}",auth=auth_Employee,response=schema.customerschema)
+    @route.put("/addsub/{pk}",auth=auth_Employee,response=schema.customerschema)
     def addsubs(self,pk,payload:schema.subsschema):
         customer = get_object_or_404(models.Customer, id=pk)
-        sub=customer.subs
-        sub.subtime=payload.subtime
-        sub.save()
+        customer.subs=payload.subtime
+        customer.save()
         return customer
     
