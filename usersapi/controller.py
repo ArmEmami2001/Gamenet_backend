@@ -76,7 +76,7 @@ class customercontrol:
     
 @api_controller("/employee")
 class Employeecontrol:
-    @route.post("add_employee",auth=None, response=schema.workerschema)
+    @route.post("add_employee",auth=None, response={201:schema.workerschema,200:schema.workerschema, 409:schema.Errorresponseschema, 500:schema.Errorresponseschema})
     def addemployee (self,request,payload:schema.LoginSchema):
         
         logger.info(f"User creation attempt for '{payload.username}'")
@@ -133,6 +133,14 @@ class Employeecontrol:
     #     #     subs=new_subscription
     #     # )
     #     # return new_customer
+    @route.put("/worktime/{pk}",auth=auth_Employee, response=schema.workerschema)
+    def change_work_time(self, request,pk, payload: schema.WorkTimeUpdateSchema):
+        employee_profile = get_object_or_404(models.Worker, id=pk)
+
+        employee_profile.worktime = payload.worktime
+        employee_profile.save()
+
+        return employee_profile
     
     @route.get("",auth=None ,response=List[schema.workerschema])
     def employeerstat(self):
@@ -143,10 +151,10 @@ class Employeecontrol:
         return models.Customer.objects.all()
     
     @route.post("/addsub/{pk}",auth=auth_Employee,response=schema.customerschema)
-    def addsubs(self,pk,time:date):
+    def addsubs(self,pk,payload:schema.subsschema):
         customer = get_object_or_404(models.Customer, id=pk)
         sub=customer.subs
-        sub.subtime=time
+        sub.subtime=payload.subtime
         sub.save()
         return customer
     

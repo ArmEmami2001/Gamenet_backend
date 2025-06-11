@@ -3,10 +3,8 @@ from . import models
 from datetime import date
 from typing import Optional
 
-class subsschema(ModelSchema):
-    class Meta:
-        model = models.Subs
-        fields = ['id', 'subtime']
+class subsschema(Schema):
+    subtime:date
 
 # class CustomerInSchema(Schema):
 #     name: str
@@ -63,7 +61,9 @@ class customerschema(ModelSchema):
 #         fields = ['id','subs']
 #         def subrem(self,object:models.Customer)-> int :
 #             return object.subs
-        
+class WorkTimeUpdateSchema(Schema):
+    worktime: str
+
 class workerschema(ModelSchema):
     username: str
     @staticmethod

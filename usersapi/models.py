@@ -13,7 +13,7 @@ class Customer(models.Model):
     # name=models.CharField(max_length=100)
     # password=models.CharField(max_length=20)
     user = models.OneToOneField(User, on_delete=models.CASCADE,null=True, blank=True)
-    subs=models.ForeignKey(Subs,on_delete=models.SET_NULL, null=True, blank=True)
+    subs=models.DateField(null=True, blank=True)
     def sub(self):
         if timezone.now().date() < self.subs.subtime:
             subrem=(timezone.now().date())-(self.subs.subtime)
