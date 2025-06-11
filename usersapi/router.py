@@ -3,6 +3,7 @@ import jwt
 from django.conf import settings
 from django.contrib.auth.models import User
 from ninja.security import HttpBearer
+from ninja.errors import HttpError
 
 
 class JWTAuth(HttpBearer):
@@ -11,7 +12,7 @@ class JWTAuth(HttpBearer):
         try:
            
             payload = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
-            user = User.objects.get(id=payload['id'])
+            user = User.objects.get(id=payload['user_id'])
             return user
 
         except jwt.ExpiredSignatureError:
@@ -24,7 +25,7 @@ class EmployeeAuth(HttpBearer):
         try:
             
             payload = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
-            user = User.objects.get(id=payload['id'])
+            user = User.objects.get(id=payload['user_id'])
             
             if hasattr(user, 'worker'):
                 
@@ -36,3 +37,14 @@ class EmployeeAuth(HttpBearer):
             
         
         return None
+    
+class IsEmployee(JWTAuth):
+
+    def authenticate(self, request, token):
+        
+        user, payload = super().authenticate(request, token)
+
+        if not hasattr(user, 'worker'):
+            raise HttpError(403, "You do not have permission to perform this action.")
+
+        return user, payload

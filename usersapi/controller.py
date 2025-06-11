@@ -13,6 +13,8 @@ from ninja.responses import Response
 from django.contrib.auth.models import User
 import logging
 from . import router
+from ninja_jwt.authentication import JWTAuth
+from .router import IsEmployee
 auth = router.JWTAuth()
 auth_Employee=router.EmployeeAuth()
 logger = logging.getLogger(__name__)
@@ -67,13 +69,13 @@ class customercontrol:
 
         return 201, new_customer
     
-    @route.get("/me" ,auth=auth, response=schema.customerschema)
+    @route.get("/me" ,auth=JWTAuth(), response=schema.customerschema)
     def get_my_profile(self, request):
         customer = get_object_or_404(models.Customer, user=request.user)
         
         return customer
     
-@api_controller("/employee")
+@api_controller("/employee", auth=JWTAuth())
 class Employeecontrol:
     @route.post("add_employee",auth=None, response={201:schema.workerschema,200:schema.workerschema, 409:schema.Errorresponseschema, 500:schema.Errorresponseschema})
     def addemployee (self,request,payload:schema.LoginSchema):
@@ -104,7 +106,13 @@ class Employeecontrol:
         logger.info(f"User '{new_user.username}' created and logged in successfully.")
 
         return 201, new_empolyee
-    
+    @route.get("/me", permissions=[IsEmployee()], response=schema.workerschema)
+    def get_my_profile(self, request):
+        return request.user.worker
+    # @route.get("/me", permissions=[IsEmployee], response=schema.workerschema)
+    # def get_my_profile(self, request):
+    #     worker = get_object_or_404(models.Worker, user=request.user)
+    #     return worker
     # def create_customer(self, payload: schema.LoginSchema):
     #     try:
     #         new_user = User.objects.create_user(
@@ -132,7 +140,7 @@ class Employeecontrol:
     #     #     subs=new_subscription
     #     # )
     #     # return new_customer
-    @route.put("/worktime/{pk}",auth=auth_Employee, response=schema.workerschema)
+    @route.put("/worktime/{pk}",permissions=[IsEmployee], response=schema.workerschema)
     def change_work_time(self, request,pk, payload: schema.WorkTimeUpdateSchema):
         employee_profile = get_object_or_404(models.Worker, id=pk)
 
@@ -145,7 +153,7 @@ class Employeecontrol:
     def employeerstat(self):
         return models.Worker.objects.all()
     
-    @route.get("/addsub",auth=auth_Employee,response=List[schema.customerschema]) 
+    @route.get("/addsub",permissions=[IsEmployee],response=List[schema.customerschema]) 
     def addsub(self):
         return models.Customer.objects.all()
     
