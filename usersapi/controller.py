@@ -10,10 +10,7 @@ from datetime import date
 from ninja_jwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
 from ninja.responses import Response
-from ninja_jwt.authentication import JWTAuth
 from django.contrib.auth.models import User
-from ninja import Router
-from ninja.security import HttpBearer
 import logging
 from . import router
 auth = router.JWTAuth
@@ -34,14 +31,14 @@ class AuthController:
             }
         
         return Response({"message": "Invalid credentials"}, status=401)
-@api_controller("/customer", auth=JWTAuth())
+@api_controller("/customer", auth=None)
 class customercontrol:
 
     @route.post("/create-customer", response={201:schema.customerschema,200:schema.customerschema, 422:schema.Errorresponseschema, 500:schema.Errorresponseschema})
     def create_customer(self, request, payload: schema.LoginSchema):
         
-        ip_address = request.META.get("REMOTE_ADDR")
-        logger.info(f"User creation attempt for '{payload.username}' from IP: {ip_address}")
+        # ip_address = request.META.get("REMOTE_ADDR")
+        logger.info(f"User creation attempt for '{payload.username}'")
 
         try:
             
@@ -70,11 +67,10 @@ class customercontrol:
 
         return 201, new_customer
     
-    @route.get("/{pk}" ,auth=auth, response=schema.customerschema)
-    def personal_greeting(self,request, pk: int):
-        customer = get_object_or_404(models.Customer, id=pk)
-        if customer.user != request.user:
-            return 403, {"message": "You do not have permission to view this customer."}
+    @route.get("/me" ,auth=auth, response=schema.customerschema)
+    def get_my_profile(self, request):
+        customer = get_object_or_404(models.Customer, user=request.user)
+        
         return customer
     
 @api_controller("/worker")
