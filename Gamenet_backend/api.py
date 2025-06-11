@@ -1,5 +1,7 @@
 from ninja_extra import NinjaExtraAPI
 from usersapi import controller
+from ninja import Router
+from ninja.security import HttpBearer
 
 api = NinjaExtraAPI(
     title="GameNet",
@@ -9,3 +11,4 @@ api = NinjaExtraAPI(
 
 api.register_controllers(controller.customercontrol)
 api.register_controllers(controller.Workercontrol)
+api.register_controllers(controller.AuthController)

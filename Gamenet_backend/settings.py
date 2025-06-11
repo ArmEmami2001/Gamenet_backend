@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'usersapi',
     'corsheaders',
     'ninja_extra',
+    'ninja_jwt',
   
 ]
 
