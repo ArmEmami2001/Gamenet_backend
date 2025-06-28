@@ -86,7 +86,8 @@ class Employeecontrol:
             
             new_user = User.objects.create_user(
                 username=payload.username,
-                password=payload.password
+                password=payload.password,
+                is_staff=True,
 
             )
         except IntegrityError:
@@ -106,41 +107,11 @@ class Employeecontrol:
         logger.info(f"User '{new_user.username}' created and logged in successfully.")
 
         return 201, new_empolyee
-    @route.get("/me", permissions=[IsEmployee()], response=schema.workerschema)
+    @route.get("/me", auth=JWTAuth(), response=schema.workerschema)
     def get_my_profile(self, request):
         return request.user.worker
-    # @route.get("/me", permissions=[IsEmployee], response=schema.workerschema)
-    # def get_my_profile(self, request):
-    #     worker = get_object_or_404(models.Worker, user=request.user)
-    #     return worker
-    # def create_customer(self, payload: schema.LoginSchema):
-    #     try:
-    #         new_user = User.objects.create_user(
-    #             username=payload.username,
-    #             password=payload.password
-    #         )
-    #     except Exception as e:
-    #         return 422, {"message": "Failed to create user.", "detail": str(e)}
-
-    #     # Step 2: Create the subscription object.
-    #     new_subscription = models.Subs.objects.create(subtime=timezone.now().date())
-        
-    #     # Step 3: Create the Customer, linking it to the new User.
-    #     new_customer = models.Customer.objects.create(
-    #         user=new_user, 
-    #         subs=new_subscription
-    #     )
-    #     return 201, new_customer
-    #     # new_subscription = models.Subs.objects.create(subtime=timezone.now().date())
-        
-       
-    #     # new_customer = models.Customer.objects.create(
-    #     #     username=payload.username,
-    #     #     password=payload.password, 
-    #     #     subs=new_subscription
-    #     # )
-    #     # return new_customer
-    @route.put("/worktime/{pk}",permissions=[IsEmployee], response=schema.workerschema)
+    
+    @route.put("/worktime/{pk}",auth=JWTAuth(), response=schema.workerschema)
     def change_work_time(self, request,pk, payload: schema.WorkTimeUpdateSchema):
         employee_profile = get_object_or_404(models.Worker, id=pk)
 
@@ -150,15 +121,15 @@ class Employeecontrol:
         return employee_profile
     
     @route.get("",auth=None ,response=List[schema.workerschema])
-    def employeerstat(self):
+    def employeerstat(self,request):
         return models.Worker.objects.all()
     
-    @route.get("/addsub",permissions=[IsEmployee],response=List[schema.customerschema]) 
-    def addsub(self):
+    @route.get("/addsub",auth=JWTAuth(),response=List[schema.customerschema]) 
+    def addsub(self,request):
         return models.Customer.objects.all()
     
-    @route.put("/addsub/{pk}",auth=auth_Employee,response=schema.customerschema)
-    def addsubs(self,pk,payload:schema.subsschema):
+    @route.put("/addsub/{pk}",auth=JWTAuth(),response=schema.customerschema)
+    def addsubs(self,request,pk,payload:schema.subsschema):
         customer = get_object_or_404(models.Customer, id=pk)
         customer.subs=payload.subtime
         customer.save()

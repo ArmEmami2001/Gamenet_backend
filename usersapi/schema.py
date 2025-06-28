@@ -24,7 +24,7 @@ class customerschema(ModelSchema):
     def resolve_username(obj):
         if obj.user:
             return obj.user.username
-        return "N/A"
+        return "N/A (No User Linked)"
 
     
     days_remaining: int
