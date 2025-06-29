@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'ninja_extra',
     'ninja_jwt',
+    'rest_framework_simplejwt',
   
 ]
 
@@ -127,12 +128,12 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-SIMPLE_JWT = {
-    # This tells ninja-jwt to use our custom serializer when creating tokens
-    'TOKEN_OBTAIN_SERIALIZER': 'usersapi.serializers.MyTokenObtainPairSerializer',
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60), # Optional: Set token lifetime
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),   # Optional: Set refresh token lifetime
-}
+# NINJA_JWT = {
+#     # This tells ninja-jwt to use our custom serializer when creating tokens
+#     'TOKEN_OBTAIN_SERIALIZER': 'usersapi.router.MyTokenObtainPairSerializer',
+#     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60), # Optional: Set token lifetime
+#     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),   # Optional: Set refresh token lifetime
+# }
 
 CORS_ALLOWED_ORIGINS = [
          "http://localhost:5173", 

@@ -17,21 +17,21 @@ from ninja_jwt.authentication import JWTAuth
 from .router import IsEmployee,MyTokenObtainPairSerializer
 logger = logging.getLogger(__name__)
 
-# @api_controller("/auth")
-# class AuthController:
+@api_controller("/auth")
+class AuthController:
 
-#     @route.post("/login", auth=None, response={200: schema.TokenResponseSchema, 401: schema.Errorresponseschema})
-#     def login(self, request, payload: schema.LoginSchema):
-#         user = authenticate(username=payload.username, password=payload.password)
+    @route.post("/login", auth=None, response={200: schema.TokenResponseSchema, 401: schema.Errorresponseschema})
+    def login(self, request, payload: schema.LoginSchema):
+        user = authenticate(username=payload.username, password=payload.password)
 
-#         if user is not None:
-#             refresh = RefreshToken.for_user(user)
-#             return {
-#                 "access": str(refresh.access_token),
-#                 "refresh": str(refresh),
-#             }
+        if user is not None:
+            refresh = RefreshToken.for_user(user)
+            return {
+                "access": str(refresh.access_token),
+                "refresh": str(refresh),
+            }
         
-#         return Response({"message": "Invalid credentials"}, status=401)
+        return Response({"message": "Invalid credentials"}, status=401)
 @api_controller("/customer", auth=None)
 class customercontrol:
 
@@ -104,11 +104,11 @@ class Employeecontrol:
         logger.info(f"User '{new_user.username}' created and logged in successfully.")
 
         return 201, new_empolyee
-    @route.get("/me", permissions=[IsEmployee()], response=schema.workerschema)
+    @route.get("/me", response=schema.workerschema)
     def get_my_profile(self, request):
         return request.user.worker
     
-    @route.put("/worktime/{pk}",permissions=[IsEmployee()], response=schema.workerschema)
+    @route.put("/worktime/{pk}", response=schema.workerschema)
     def change_work_time(self, request,pk, payload: schema.WorkTimeUpdateSchema):
         employee_profile = get_object_or_404(models.Worker, id=pk)
 
@@ -117,15 +117,15 @@ class Employeecontrol:
 
         return employee_profile
     
-    @route.get("",permissions=[IsEmployee()] ,response=List[schema.workerschema])
+    @route.get("",response=List[schema.workerschema])
     def employeerstat(self,request):
         return models.Worker.objects.all()
     
-    @route.get("/addsub",permissions=[IsEmployee()],response=List[schema.customerschema]) 
+    @route.get("/addsub",response=List[schema.customerschema]) 
     def addsub(self,request):
         return models.Customer.objects.all()
     
-    @route.put("/addsub/{pk}",permissions=[IsEmployee()],response=schema.customerschema)
+    @route.put("/addsub/{pk}",response=schema.customerschema)
     def addsubs(self,request,pk,payload:schema.subsschema):
         customer = get_object_or_404(models.Customer, id=pk)
         customer.subs=payload.subtime
